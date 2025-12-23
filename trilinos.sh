@@ -4,8 +4,7 @@
 
 # Build Trilinos
 # Options:
-#       - TRILINOS_VER (str): Trilinos version (e.g. 14-4-0), recommended by the official build guide
-#       - PARALLEL (boolen): Compiled for parallel
+#       - PARALLEL (boolen): Compiled for MPI parallelism
 
 PARALLEL=${PARALLEL:-true}
 
@@ -42,8 +41,8 @@ else
     )
 fi
 
-mkdir -p "$BIN_PATH"
-mkdir -p "$SRC_DIR"/build && cd "$SRC_DIR"/build || exit
+mkdir -p "$BIN_PATH" "$SRC_DIR"/build
+cd "$SRC_DIR"/build || exit
 
 # Build
 cmake \
