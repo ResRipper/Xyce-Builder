@@ -41,6 +41,4 @@
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
 xyce_conf
-xyce_log.txt
-Xyce_bin_parallel
-Xyce_bin_serial
+*log*
