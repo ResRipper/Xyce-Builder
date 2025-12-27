@@ -4,7 +4,7 @@
 
 # Build Trilinos
 # Options:
-#       - PARALLEL (boolen): Compiled for MPI parallelism
+#       - PARALLEL (boolen): Compile for MPI parallelism
 
 PARALLEL=${PARALLEL:-true}
 
@@ -19,24 +19,37 @@ FLAGS="-O3 -fPIC"
 
 # Build config
 BUILD_CONFIG=(
+    # AMD
     "-D AMD_LIBRARY_DIRS=${LIB_PATH}"
     "-D TPL_AMD_INCLUDE_DIRS=${SUITESPARSE_INCLUDE}"
+
+    # OpenMP
+    '-D Trilinos_ENABLE_OpenMP=ON'
+
+    # METIS
+    '-D TPL_ENABLE_METIS=ON'
 )
 
 # Specify compilers and cmake file
 if [ "$PARALLEL" = true ]; then
     BUILD_CONFIG+=(
-        '-DCMAKE_C_COMPILER=mpicc'
-        '-DCMAKE_CXX_COMPILER=mpic++'
-        '-DCMAKE_Fortran_COMPILER=mpif77'
+        '-D CMAKE_C_COMPILER=mpicc'
+        '-D CMAKE_CXX_COMPILER=mpic++'
+        '-D CMAKE_Fortran_COMPILER=mpif77'
         "-C ${XYCE_SRC}/cmake/trilinos/trilinos-MPI-base.cmake"
-    )
 
+        # ShyLU require MPI
+        '-D Trilinos_ENABLE_ShyLU=ON'
+        '-D Trilinos_ENABLE_ShyLU_NodeBasker=ON' # Xyce support Basker solver
+
+        # parMETIS
+        '-D TPL_ENABLE_ParMETIS=ON'
+    )
 else
     BUILD_CONFIG+=(
-        '-DCMAKE_C_COMPILER=gcc'
-        '-DCMAKE_CXX_COMPILER=g++'
-        '-DCMAKE_Fortran_COMPILER=gfortran'
+        '-D CMAKE_C_COMPILER=gcc'
+        '-D CMAKE_CXX_COMPILER=g++'
+        '-D CMAKE_Fortran_COMPILER=gfortran'
         "-C ${XYCE_SRC}/cmake/trilinos/trilinos-base.cmake"
     )
 fi
