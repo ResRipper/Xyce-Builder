@@ -6,7 +6,7 @@
 # Options:
 #       - PARALLEL (boolen): Compile for MPI parallelism
 
-PARALLEL=${PARALLEL:-true}
+PARALLEL=${PARALLEL:-false}
 
 SRC_DIR=$HOME/Trilinos
 BIN_PATH=$HOME/Trilinos_bin
