@@ -30,8 +30,8 @@ DEPS_PRL=(
 
 TEST_DEP=(
     'perl'
-    'python3'
-    'python-is-python3'
+    'python3' 'python-is-python3'
+    'python3-numpy' 'python3-scipy'
     'libgtest-dev'
 )
 
