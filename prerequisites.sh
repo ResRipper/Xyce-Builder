@@ -20,6 +20,9 @@ DEPS=(
     'libblas-dev' 'libfftw3-dev' 'libfl-dev'
     'liblapack-dev' 'libmetis-dev' 'libomp-dev'
     'libsuitesparse-dev'
+
+    # Documentation
+    'latexmk' 'texlive'
 )
 
 # Dependencies - Parallel
@@ -43,3 +46,8 @@ ${TEST_DEP[*]}
 if [ "$PARALLEL" = true ]; then
     apt install -y ${DEPS_PRL[*]}
 fi
+
+# LaTeX dependencies
+tlmgr init-usertree
+tlmgr install binhex enumitem framed kastrup \
+    multirow newtx optional pgf preprint
