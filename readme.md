@@ -9,6 +9,23 @@ Scripts to build and test Xyce.
 
 Parallel/MPI build is disable by default, since running the test suite takes extreamly long time (>12h on VM with 4x Zen 4 cores).
 
+## Usage
+
+1. Pull all repositories and install dependencies
+
+    - [repo_prepare.sh](./repo_prepare.sh)
+    - [prerequisites.sh](./prerequisites.sh)
+
+2. Build Trilinos
+
+    - [trilinos.sh](./trilinos.sh)
+
+3. Build Xyce
+
+    - [build.sh](./build.sh)
+
+Output file: `~/xyce_<serial or parallel>-<version>.tar.zst`
+
 ## Enabled options
 
 ### Trilinos
