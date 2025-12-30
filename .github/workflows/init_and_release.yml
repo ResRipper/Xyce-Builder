@@ -1,0 +1,57 @@
+# Copyright 2025 ResRipper.
+# SPDX-License-Identifier: Apache-2.0
+
+# Configure build parameters and upload built files to release
+
+name: Initialize build and release
+
+on:
+    push:
+    workflow_dispatch:
+
+env:
+    XYCE_VER: '7.10.0'
+
+jobs:
+    build:
+        # strategy:
+        #     matrix:
+        #         build_type: [true, false]
+        uses: ./.github/workflows/builder.yml
+        with:
+            # parallel: ${{ matrix.build_type }}
+            parallel: false
+            # Trilinos' version is determined by Xyce
+            # https://github.com/Xyce/Xyce/blob/master/INSTALL.md#building-trilinos
+            trilinos_version: '14-4-0'
+            xyce_version: '7.10.0'
+            texlive_obsolete: true
+            texlive_version: 2023
+    
+    release:
+        runs-on: ubuntu-latest
+        needs: [build]
+        # Only create release for new tag
+        if: ${{ github.ref_type == 'tag' }}
+        permissions:
+            contents: write
+        steps: [
+            {
+                name: Download all artifacts,
+                uses: actions/download-artifact@v7,
+                with: {
+                    path: "~/",
+                    merge-multiple: true
+                }
+            },
+            {
+                name: Create release,
+                uses: softprops/action-gh-release@v2,
+                with: {
+                    draft: true,
+                    files: "~/xyce_serial-${{ env.XYCE_VER }}.tar.zst",
+                    # files: "~/xyce_serial-${{ env.XYCE_VER }}.tar.zst\n ~/xyce_parallel-${{ env.XYCE_VER }}.tar.zst",
+                    token: "${{ secrets.GITHUB_TOKEN }}"
+                }
+            },
+        ]

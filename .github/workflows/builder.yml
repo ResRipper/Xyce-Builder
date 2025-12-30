@@ -1,11 +1,36 @@
 # Copyright 2025 ResRipper.
 # SPDX-License-Identifier: Apache-2.0
 
+# Binary builder, should not be triggered directly
+
 name: builder
 
 on:
-    # push:
-    workflow_dispatch:
+    workflow_call:
+        inputs:
+            parallel:
+                description: 'Build parallel (MPI) version of Xyce'
+                required: false
+                type: boolean
+                default: false
+            trilinos_version:
+                description: 'Version of Trilinos, check Xyce requirement first'
+                required: true
+                type: string
+            xyce_version:
+                description: 'Version of Xyce to be built'
+                required: true
+                type: string
+            texlive_obsolete:
+                description: 'If TeXLive from distro is obsoleted'
+                default: true
+                required: false
+                type: boolean
+            texlive_version:
+                description: 'Version of TeXLive provided by distro'
+                default: 2023
+                required: false
+                type: number
 
 env:
     # Trilinos' version is determined by Xyce
@@ -16,10 +41,13 @@ env:
     TEXLIVE_VER: 2023
 
 jobs:
-    build_serial:
+    build:
         runs-on: ubuntu-24.04
         env:
-            PARALLEL: false
+            PARALLEL: ${{ inputs.parallel }}
+            XYCE_VER: ${{ inputs.xyce_version }}
+            TEXLIVE_OBSOLETE: ${{ inputs.texlive_obsolete }}
+            TEXLIVE_VER: ${{ inputs.texlive_version }}
         steps: [
             {
                 name: Fetch repo,
@@ -42,84 +70,12 @@ jobs:
                 run: bash build.sh
             },
             {
-                name: Upload,
+                name: Upload to artifact,
                 uses: actions/upload-artifact@v6,
                 with: {
-                    name: bin_serial,
-                    path: "~/xyce_serial-${{ env.XYCE_VER }}.tar.zst"
+                    name: "${{ env.XYCE_VER }}-${{ inputs.parallel == true && 'parallel' || 'serial' }}",
+                    path: "~/xyce_${{ inputs.parallel == true && 'parallel' || 'serial' }}-${{ env.XYCE_VER }}.tar.zst",
+                    if-no-files-found: error
                 }
             }
         ]
-
-    # build_parallel:
-    #     runs-on: ubuntu-24.04
-    #     env:
-    #         PARALLEL: true
-    #     steps: [
-    #         {
-    #             name: Fetch repo,
-    #             uses: actions/checkout@v6
-    #         },
-    #         {
-    #             name: Fetch repo,
-    #             run: bash repo_prepare.sh
-    #         },
-    #         {
-    #             name: Install prerequisites,
-    #             run: bash prerequisites.sh
-    #         },
-    #         {
-    #             name: Build Trilinos,
-    #             run: bash trilinos.sh,
-    #             env: {
-    #                 PARALLEL: true
-    #             }
-    #         },
-    #         {
-    #             name: Build Xyce,
-    #             run: bash build.sh,
-    #             env: {
-    #                 PARALLEL: true
-    #             }
-    #         },
-    #         {
-    #             name: Upload,
-    #             uses: actions/upload-artifact@v6,
-    #             with: {
-    #                 name: bin_parallel,
-    #                 path: "~/xyce_parallel-${{ env.XYCE_VER }}.tar.zst"
-    #             }
-    #         }
-    #     ]
-
-    # pack_release:
-    #     runs-on: ubuntu-latest
-    #     # needs: [build_serial, build_parallel]
-    #     needs: [build_serial]
-    #     permissions:
-    #         contents: write
-    #     steps: [
-    #         {
-    #             name: Get date,
-    #             run: echo "DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
-    #         },
-    #         {
-    #             name: Download artifacts,
-    #             uses: actions/download-artifact@v7,
-    #             with: {
-    #                 path: "~/",
-    #                 pattern: "*.tar.zst",
-    #                 merge-multiple: true
-    #             }
-    #         },
-    #         {
-    #             name: Write release,
-    #             uses: softprops/action-gh-release@v2,
-    #             with: {
-    #                 name: "Xyce-${{ env.XYCE_VER }}-${{ env.DATE }}",
-    #                 draft: true,
-    #                 files: "xyce_serial-${{ env.XYCE_VER }}.tar.zst"
-    #                 # files: "xyce_serial-${{ env.XYCE_VER }}.tar.zst\n xyce_parallel-${{ env.XYCE_VER }}.tar.zst"
-    #             }
-    #         },
-    #     ]
