@@ -6,7 +6,7 @@
 
 PARALLEL=${PARALLEL:-false}
 
-apt update && apt upgrade -y
+sudo apt update && sudo apt upgrade -y
 
 BUILD_TOOLS=(
     'gcc' 'g++' 'gfortran'
@@ -38,13 +38,13 @@ TEST_DEP=(
     'libgtest-dev'
 )
 
-apt install -y \
+sudo apt install -y \
 ${BUILD_TOOLS[*]} \
 ${DEPS[*]} \
 ${TEST_DEP[*]}
 
 if [ "$PARALLEL" = true ]; then
-    apt install -y ${DEPS_PRL[*]}
+    sudo apt install -y ${DEPS_PRL[*]}
 fi
 
 # LaTeX dependencies
