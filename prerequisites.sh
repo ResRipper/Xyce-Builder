@@ -62,5 +62,5 @@ if [ "$TEXLIVE_OBSOLETE" = true ]; then
         "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TEXLIVE_VER}/tlnet-final/"
 fi
 
-tlmgr install binhex enumitem framed kastrup \
+tlmgr install enumitem framed kastrup \
     multirow newtx optional pgf preprint
