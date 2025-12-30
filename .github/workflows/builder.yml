@@ -12,6 +12,8 @@ env:
     # https://github.com/Xyce/Xyce/blob/master/INSTALL.md#building-trilinos
     TRILINOS_VER: 14-4-0
     XYCE_VER: 7.10.0
+    TEXLIVE_OBSOLETE: true
+    TEXLIVE_VER: 2023
 
 jobs:
     build_serial:

@@ -6,6 +6,11 @@
 
 PARALLEL=${PARALLEL:-false}
 
+#  If TeXLive from distro is obsoleted
+# > https://wiki.debian.org/TeXLive
+TEXLIVE_OBSOLETE=${TEXLIVE_OBSOLETE:-true}
+TEXLIVE_VER=${TEXLIVE_VER:-2023}
+
 sudo apt update && sudo apt upgrade -y
 
 BUILD_TOOLS=(
@@ -48,6 +53,14 @@ if [ "$PARALLEL" = true ]; then
 fi
 
 # LaTeX dependencies
+
+## Change mirror
+## Mirror list: https://www.tug.org/historic/
+if [ "$TEXLIVE_OBSOLETE" = true ]; then
+    sudo tlmgr option repository \
+        "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TEXLIVE_VER}/tlnet-final/"
+fi
+
 tlmgr init-usertree
 tlmgr install binhex enumitem framed kastrup \
     multirow newtx optional pgf preprint
