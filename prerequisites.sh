@@ -53,6 +53,7 @@ if [ "$PARALLEL" = true ]; then
 fi
 
 # LaTeX dependencies
+tlmgr init-usertree
 
 ## Change mirror
 ## Mirror list: https://www.tug.org/historic/
@@ -61,6 +62,5 @@ if [ "$TEXLIVE_OBSOLETE" = true ]; then
         "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TEXLIVE_VER}/tlnet-final/"
 fi
 
-tlmgr init-usertree
 tlmgr install binhex enumitem framed kastrup \
     multirow newtx optional pgf preprint
