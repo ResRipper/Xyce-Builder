@@ -58,7 +58,7 @@ tlmgr init-usertree
 ## Change mirror
 ## Mirror list: https://www.tug.org/historic/
 if [ "$TEXLIVE_OBSOLETE" = true ]; then
-    sudo tlmgr option repository \
+    tlmgr option repository \
         "https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${TEXLIVE_VER}/tlnet-final/"
 fi
 
