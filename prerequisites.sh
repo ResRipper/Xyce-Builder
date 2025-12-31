@@ -11,7 +11,7 @@ PARALLEL=${PARALLEL:-false}
 TEXLIVE_OBSOLETE=${TEXLIVE_OBSOLETE:-true}
 TEXLIVE_VER=${TEXLIVE_VER:-2023}
 
-sudo apt update && sudo apt upgrade -y
+sudo apt update
 
 BUILD_TOOLS=(
     'gcc' 'g++' 'gfortran'
