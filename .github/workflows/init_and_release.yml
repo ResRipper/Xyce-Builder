@@ -46,12 +46,9 @@ jobs:
             },
             {
                 name: Upload files to release,
-                uses: svenstaro/upload-release-action@v2,
-                with: {
-                    repo_token: "${{ secrets.GITHUB_TOKEN }}",
-                    tag: "${{ github.ref }}",
-                    file_glob: true,
-                    file: "~/xyce_*",
+                run: "gh release upload ${{ github.ref_name }} ~/xyce_*.tar.zst",
+                env: {
+                    GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
                 }
             },
         ]
