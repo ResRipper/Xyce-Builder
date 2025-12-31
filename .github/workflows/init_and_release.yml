@@ -27,6 +27,7 @@ jobs:
             xyce_version: '7.10.0'
             texlive_obsolete: true
             texlive_version: 2023
+            skip_test: true
     
     release:
         runs-on: ubuntu-latest

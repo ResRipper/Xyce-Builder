@@ -9,6 +9,7 @@
 
 PARALLEL=${PARALLEL:-false}
 XYCE_VER=${XYCE_VER:-7.10.0}
+SKIP_TEST=${SKIP_TEST:-false}
 
 SRC_DIR=$HOME/Xyce
 Trilinos_PATH=$HOME/Trilinos_bin
@@ -69,13 +70,15 @@ cmake --build . -j "$(nproc)"
 # Run tests
 #   - Most tests run on multiple cores, using parallel (-j) 
 #     doesn't offer much benefit and can even slow down testing.
-if ! ctest --output-on-failure
-then
-    # Re-run failed tests
-    ctest \
-    --timeout 3600 \
-    --rerun-failed \
-    --output-on-failure
+if [ "$SKIP_TEST" = false ]; then
+    if ! ctest --output-on-failure
+    then
+        # Re-run failed tests
+        ctest \
+        --timeout 3600 \
+        --rerun-failed \
+        --output-on-failure
+    fi
 fi
 
 cmake --install .

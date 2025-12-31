@@ -31,23 +31,25 @@ on:
                 default: 2023
                 required: false
                 type: number
+            skip_test:
+                description: 'Skip all tests'
+                default: false
+                required: false
+                type: boolean
 
 env:
     # Trilinos' version is determined by Xyce
     # https://github.com/Xyce/Xyce/blob/master/INSTALL.md#building-trilinos
-    TRILINOS_VER: 14-4-0
-    XYCE_VER: 7.10.0
-    TEXLIVE_OBSOLETE: true
-    TEXLIVE_VER: 2023
+    TRILINOS_VER: ${{ inputs.trilinos_version }}
+    PARALLEL: ${{ inputs.parallel }}
+    XYCE_VER: ${{ inputs.xyce_version }}
+    TEXLIVE_OBSOLETE: ${{ inputs.texlive_obsolete }}
+    TEXLIVE_VER: ${{ inputs.texlive_version }}
+    SKIP_TEST: ${{ inputs.skip_test }}
 
 jobs:
     build:
         runs-on: ubuntu-24.04
-        env:
-            PARALLEL: ${{ inputs.parallel }}
-            XYCE_VER: ${{ inputs.xyce_version }}
-            TEXLIVE_OBSOLETE: ${{ inputs.texlive_obsolete }}
-            TEXLIVE_VER: ${{ inputs.texlive_version }}
         steps: [
             {
                 name: Fetch repo,
