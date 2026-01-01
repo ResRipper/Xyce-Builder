@@ -9,7 +9,7 @@
 PARALLEL=${PARALLEL:-false}
 
 SRC_DIR=$HOME/Trilinos
-BIN_PATH=$HOME/Trilinos_bin
+BIN_PATH=/usr
 XYCE_SRC=$HOME/Xyce
 
 LIB_PATH=/usr/lib64

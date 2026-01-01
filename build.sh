@@ -12,7 +12,7 @@ XYCE_VER=${XYCE_VER:-7.10.0}
 SKIP_TEST=${SKIP_TEST:-false}
 
 SRC_DIR=$HOME/Xyce
-Trilinos_PATH=$HOME/Trilinos_bin
+Trilinos_PATH=/usr
 TEST_SUITE_PATH=$HOME/Xyce_Regression
 
 SUITESPARSE_INCLUDE=/usr/include/suitesparse
