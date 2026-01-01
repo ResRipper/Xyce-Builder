@@ -72,6 +72,10 @@ jobs:
                 run: bash build.sh
             },
             {
+                name: Adjust path,
+                run: python3 ./replace_path.py
+            },
+            {
                 name: Upload to artifact,
                 uses: actions/upload-artifact@v6,
                 with: {

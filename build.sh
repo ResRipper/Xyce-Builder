@@ -83,6 +83,17 @@ fi
 
 cmake --install .
 
+# Move files under `/share` into a dedicated folder `/share/xyce-<type>`
+mkdir -p "${BIN_PATH}"/share_tmp
+cp -r "${BIN_PATH}"/share/ "${BIN_PATH}"/share_tmp/ && rm -rf "${BIN_PATH}"/share
+mv "${BIN_PATH}"/share_tmp "${BIN_PATH}"/share
+
+if [ "$PARALLEL" = true ]; then
+    mv "${BIN_PATH}"/share/share "${BIN_PATH}"/share/xyce-parallel
+else
+    mv "${BIN_PATH}"/share/share "${BIN_PATH}"/share/xyce-serial
+fi
+
 # Build documentation
 ## Reference guide
 cd "${SRC_DIR}"/doc/Reference_Guide || exit
