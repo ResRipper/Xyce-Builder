@@ -65,4 +65,4 @@ cmake \
     -D CMAKE_Fortran_FLAGS="$FLAGS" \
     ${BUILD_CONFIG[*]} "$SRC_DIR"
 
-cmake --build . -j "$(nproc)" -t install
+sudo cmake --build . -j "$(nproc)" -t install
