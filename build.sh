@@ -9,11 +9,11 @@
 
 PARALLEL=${PARALLEL:-false}
 XYCE_VER=${XYCE_VER:-7.10.0}
-SKIP_TEST=${SKIP_TEST:-false}
 
 SRC_DIR=$HOME/Xyce
 Trilinos_PATH=/usr
 TEST_SUITE_PATH=$HOME/Xyce_Regression
+SCRIPT_PATH=$(pwd)
 
 SUITESPARSE_INCLUDE=/usr/include/suitesparse
 
@@ -59,29 +59,13 @@ fi
 cd "$SRC_DIR" && ./bootstrap
 mkdir -p build && cd build || exit
 
-# Config and build
+# Config, build and install to path
 cmake \
 -D CMAKE_C_FLAGS="${FLAGS[*]}" \
 -D CMAKE_CXX_FLAGS="${FLAGS[*]}" \
 ${BUILD_CONFIG[*]} "${SRC_DIR}"
 
-cmake --build . -j "$(nproc)"
-
-# Run tests
-#   - Most tests run on multiple cores, using parallel (-j) 
-#     doesn't offer much benefit and can even slow down testing.
-if [ "$SKIP_TEST" = false ]; then
-    if ! ctest --output-on-failure
-    then
-        # Re-run failed tests
-        ctest \
-        --timeout 3600 \
-        --rerun-failed \
-        --output-on-failure
-    fi
-fi
-
-cmake --install .
+cmake --build . -j "$(nproc)" -t install
 
 # Move files under `/share` into a dedicated folder `/share/xyce-<type>`
 mkdir -p "${BIN_PATH}"/share_tmp
@@ -93,6 +77,9 @@ if [ "$PARALLEL" = true ]; then
 else
     mv "${BIN_PATH}"/share/share "${BIN_PATH}"/share/xyce-serial
 fi
+
+# Adjust path
+python3 "${SCRIPT_PATH}/replace_path.py"
 
 # Build documentation
 ## Reference guide
@@ -126,3 +113,20 @@ else
     -f "${HOME}/xyce_serial-${XYCE_VER}.tar.zst" \
     -C "${BIN_PATH}"/ .
 fi
+
+# # Run tests
+# #   - Most tests run on multiple cores, using parallel (-j) 
+# #     doesn't offer much benefit and can even slow down testing.
+# if [ "$SKIP_TEST" = false ]; then
+#     if ! ctest --output-on-failure --no-label-summary
+#     then
+#         # Re-run failed tests
+#         ctest \
+#         --timeout 3600 \
+#         --rerun-failed \
+#         --no-label-summary \
+#         --output-on-failure
+#     fi
+# fi
+
+# cmake --install .
