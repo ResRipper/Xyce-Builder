@@ -9,16 +9,17 @@
 
 PARALLEL=${PARALLEL:-false}
 XYCE_VER=${XYCE_VER:-7.10.0}
+TEST=${TEST:-false}
 
 SRC_DIR=$HOME/Xyce
 Trilinos_PATH=/usr
-TEST_SUITE_PATH=$HOME/Xyce_Regression
 SCRIPT_PATH=$(pwd)
 
 SUITESPARSE_INCLUDE=/usr/include/suitesparse
 
 # Installation prefix
 BIN_PATH=$HOME/Xyce_bin
+INSTALL_PATH=/usr
 mkdir -p "$BIN_PATH"
 
 # Compilier flags
@@ -31,13 +32,13 @@ FLAGS=(
 # Build config
 BUILD_CONFIG=(
     "-D Trilinos_ROOT=${Trilinos_PATH}"
-    "-D CMAKE_INSTALL_PREFIX=${BIN_PATH}"
+    "-D CMAKE_INSTALL_PREFIX=${INSTALL_PATH}"
     '-D Xyce_PLUGIN_SUPPORT=ON'
 
-    # Test
-    '-D BUILD_TESTING=ON'
-    "-D Xyce_REGRESSION_DIR=${TEST_SUITE_PATH}"
-    '-D Xyce_GTEST_UNIT_TESTS=ON' # Enable Google Test
+    # # Test
+    # '-D BUILD_TESTING=ON'
+    # "-D Xyce_REGRESSION_DIR=${TEST_SUITE_PATH}"
+    # '-D Xyce_GTEST_UNIT_TESTS=ON' # Enable Google Test
 )
 
 if [ "$PARALLEL" = true ]; then
@@ -59,57 +60,73 @@ fi
 cd "$SRC_DIR" && ./bootstrap
 mkdir -p build && cd build || exit
 
-# Config, build and install to path
+# Config and build
 cmake \
 -D CMAKE_C_FLAGS="${FLAGS[*]}" \
 -D CMAKE_CXX_FLAGS="${FLAGS[*]}" \
 ${BUILD_CONFIG[*]} "${SRC_DIR}"
 
-cmake --build . -j "$(nproc)" -t install
+cmake --build . -j "$(nproc)"
 
-# Move files under `/share` into a dedicated folder `/share/xyce-<type>`
-mkdir -p "${BIN_PATH}"/share_tmp
-cp -r "${BIN_PATH}"/share/ "${BIN_PATH}"/share_tmp/ && rm -rf "${BIN_PATH}"/share
-mv "${BIN_PATH}"/share_tmp "${BIN_PATH}"/share
-
+## Adjust installation path to comply with the FHS
 if [ "$PARALLEL" = true ]; then
-    mv "${BIN_PATH}"/share/share "${BIN_PATH}"/share/xyce-parallel
+    sed -i 's|${XyceInstDir}/share|${XyceInstDir}/share/xyce-parallel|' "${SRC_DIR}"/build/buildxyceplugin.sh
+    sed -i 's|/usr/share|/usr/share/xyce-parallel|' "${SRC_DIR}"/build/utils/XyceCInterface/SetupPythonEnv.m
+    sed -i 's|${Xyce_DIR}/../../../share/|${Xyce_DIR}/../../../share/xyce-parallel|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
+    sed -i 's|<Path to Xyce Install>/share|<Path to Xyce Install>/share/xyce-parallel|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
 else
-    mv "${BIN_PATH}"/share/share "${BIN_PATH}"/share/xyce-serial
+    sed -i 's|${XyceInstDir}/share|${XyceInstDir}/share/xyce-serial|' "${SRC_DIR}"/build/buildxyceplugin.sh
+    sed -i 's|/usr/share|/usr/share/xyce-serial|' "${SRC_DIR}"/build/utils/XyceCInterface/SetupPythonEnv.m
+    sed -i 's|${Xyce_DIR}/../../../share/|${Xyce_DIR}/../../../share/xyce-serial|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
+    sed -i 's|<Path to Xyce Install>/share|<Path to Xyce Install>/share/xyce-serial|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
 fi
 
-# Adjust path
-python3 "${SCRIPT_PATH}/replace_path.py"
+python3 "${SCRIPT_PATH}"/replace_path.py "${SRC_DIR}"/build
+
+# Install to binary path
+cmake --install . --prefix "${BIN_PATH}"
+# Install to current environment for testing
+if [ "$TEST" = true ]; then
+    sudo cmake --install .
+fi
 
 # Build documentation
 ## Reference guide
 cd "${SRC_DIR}"/doc/Reference_Guide || exit
-## Replace Sandia's internal class
+### Replace Sandia's internal class
 sed -i 's|\\documentclass\[11pt,report\]{SANDreport}|\\documentclass\[11pt,letterpaper\]{scrreprt}|' Xyce_RG.tex
 sed -i 's|\\usepackage\[sand\]{optional}|\\usepackage\[report\]{optional}|' Xyce_RG.tex
 sed -i 's|\\SANDauthor{|\\author{|' Xyce_RG.tex
 make
 
-# User guide
+## User guide
 cd "${SRC_DIR}"/doc/Users_Guide || exit
-## Replace Sandia's internal class
+### Replace Sandia's internal class
 sed -i 's|\\documentclass\[11pt,report\]{SANDreport}|\\documentclass\[11pt,letterpaper\]{scrreprt}|' Xyce_UG.tex
 sed -i 's|\\usepackage\[sand\]{optional}|\\usepackage\[report\]{optional}|' Xyce_UG.tex
 sed -i 's|\\SANDauthor{|\\author{|' Xyce_UG.tex
 make
 
-# Packup
-mv "${SRC_DIR}"/doc/Reference_Guide/Xyce_RG.pdf "${BIN_PATH}"/doc/
-mv "${SRC_DIR}"/doc/Users_Guide/Xyce_UG.pdf "${BIN_PATH}"/doc/
-rm "${SRC_DIR}"/doc/README.TXT
-
-mkdir -p "${BIN_PATH}"/share/doc/
+# Move files
+BUILD_TYPE='serial'
 if [ "$PARALLEL" = true ]; then
-    mv "${BIN_PATH}"/doc/ "${BIN_PATH}"/share/doc/xyce-parallel
-else
-    mv "${BIN_PATH}"/doc/ "${BIN_PATH}"/share/doc/xyce-serial
+    BUILD_TYPE='parallel'
 fi
 
+mkdir -p "${BIN_PATH}"/share/licenses/xyce-"${BUILD_TYPE}"
+
+## License
+mv "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"/CPack.OSLicense.txt "${BIN_PATH}"/share/licenses/xyce-"${BUILD_TYPE}"/
+
+## Doc
+
+### Delete 'no pdf doc anymore' note
+rm "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"/README.TXT
+
+mv "${SRC_DIR}"/doc/Reference_Guide/Xyce_RG.pdf "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"
+mv "${SRC_DIR}"/doc/Users_Guide/Xyce_UG.pdf "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"
+
+# Pack
 if [ "$PARALLEL" = true ]; then
     tar -c \
     --zstd \
@@ -121,20 +138,3 @@ else
     -f "${HOME}/xyce_serial-${XYCE_VER}.tar.zst" \
     -C "${BIN_PATH}"/ .
 fi
-
-# # Run tests
-# #   - Most tests run on multiple cores, using parallel (-j) 
-# #     doesn't offer much benefit and can even slow down testing.
-# if [ "$SKIP_TEST" = false ]; then
-#     if ! ctest --output-on-failure --no-label-summary
-#     then
-#         # Re-run failed tests
-#         ctest \
-#         --timeout 3600 \
-#         --rerun-failed \
-#         --no-label-summary \
-#         --output-on-failure
-#     fi
-# fi
-
-# cmake --install .
