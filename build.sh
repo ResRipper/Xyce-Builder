@@ -101,6 +101,14 @@ make
 # Packup
 mv "${SRC_DIR}"/doc/Reference_Guide/Xyce_RG.pdf "${BIN_PATH}"/doc/
 mv "${SRC_DIR}"/doc/Users_Guide/Xyce_UG.pdf "${BIN_PATH}"/doc/
+rm "${SRC_DIR}"/doc/README.TXT
+
+mkdir -p "${BIN_PATH}"/share/doc/
+if [ "$PARALLEL" = true ]; then
+    mv "${BIN_PATH}"/doc/ "${BIN_PATH}"/share/doc/xyce-parallel
+else
+    mv "${BIN_PATH}"/doc/ "${BIN_PATH}"/share/doc/xyce-serial
+fi
 
 if [ "$PARALLEL" = true ]; then
     tar -c \
