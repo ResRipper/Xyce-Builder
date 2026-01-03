@@ -36,17 +36,9 @@ DEPS_PRL=(
     'libparmetis-dev'
 )
 
-TEST_DEP=(
-    'perl'
-    'python3' 'python-is-python3'
-    'python3-numpy' 'python3-scipy'
-    'libgtest-dev'
-)
-
 sudo apt install -y \
 ${BUILD_TOOLS[*]} \
-${DEPS[*]} \
-${TEST_DEP[*]}
+${DEPS[*]}
 
 if [ "$PARALLEL" = true ]; then
     sudo apt install -y ${DEPS_PRL[*]}

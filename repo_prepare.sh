@@ -9,7 +9,6 @@ TRILINOS_SRC=$HOME/Trilinos
 
 XYCE_VER=${XYCE_VER:-7.10.0}
 XYCE_SRC=$HOME/Xyce
-TEST_SUITE_PATH=$HOME/Xyce_Regression
 
 # Trilinos
 git clone \
@@ -24,10 +23,3 @@ git clone \
     --branch  Release-"${XYCE_VER}" \
     https://github.com/Xyce/Xyce \
     "$XYCE_SRC"
-
-# Test suite
-git clone \
-    --depth 1 \
-    --branch  Release-"${XYCE_VER}" \
-    https://github.com/Xyce/Xyce_Regression \
-    "$TEST_SUITE_PATH"

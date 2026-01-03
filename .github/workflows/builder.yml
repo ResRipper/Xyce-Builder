@@ -31,9 +31,9 @@ on:
                 default: 2023
                 required: false
                 type: number
-            skip_test:
-                description: 'Skip all tests'
-                default: false
+            test:
+                description: 'Enable testing'
+                default: true
                 required: false
                 type: boolean
 
@@ -45,7 +45,7 @@ env:
     XYCE_VER: ${{ inputs.xyce_version }}
     TEXLIVE_OBSOLETE: ${{ inputs.texlive_obsolete }}
     TEXLIVE_VER: ${{ inputs.texlive_version }}
-    SKIP_TEST: ${{ inputs.skip_test }}
+    TEST: ${{ inputs.test }}
 
 jobs:
     build:
@@ -69,7 +69,12 @@ jobs:
             },
             {
                 name: Build Xyce,
-                run: bash build.sh
+                run: bash build.sh,
+            },
+            {
+                name: Test Xyce,
+                if: inputs.test,
+                run: bash test.sh
             },
             {
                 name: Upload to artifact,
