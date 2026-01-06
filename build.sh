@@ -34,6 +34,7 @@ BUILD_CONFIG=(
     "-D Trilinos_ROOT=${Trilinos_PATH}"
     "-D CMAKE_INSTALL_PREFIX=${INSTALL_PATH}"
     '-D Xyce_PLUGIN_SUPPORT=ON'
+    "-D Xyce_ROL=ON"
 
     # # Test
     # '-D BUILD_TESTING=ON'

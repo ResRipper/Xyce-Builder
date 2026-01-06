@@ -23,6 +23,9 @@ BUILD_CONFIG=(
     "-D AMD_LIBRARY_DIRS=${LIB_PATH}"
     "-D TPL_AMD_INCLUDE_DIRS=${SUITESPARSE_INCLUDE}"
 
+    # ROL
+    "-D Trilinos_ENABLE_ROL=ON"
+
     # OpenMP
     '-D Trilinos_ENABLE_OpenMP=ON'
 
