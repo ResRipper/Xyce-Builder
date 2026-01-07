@@ -9,7 +9,6 @@
 
 PARALLEL=${PARALLEL:-false}
 XYCE_VER=${XYCE_VER:-7.10.0}
-TEST=${TEST:-false}
 
 SRC_DIR=$HOME/Xyce
 Trilinos_PATH=/usr
@@ -86,10 +85,6 @@ python3 "${SCRIPT_PATH}"/replace_path.py "${SRC_DIR}"/build
 
 # Install to binary path
 cmake --install . --prefix "${BIN_PATH}"
-# Install to current environment for testing
-if [ "$TEST" = true ]; then
-    sudo cmake --install .
-fi
 
 # Build documentation
 ## Reference guide
