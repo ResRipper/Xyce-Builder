@@ -5,7 +5,8 @@
 #
 # Test Xyce
 #
-# CMake method doesn't work (`if(TARGET Xyce)` is always true somehow)
+# CTest local install functionality has not been merged with v7.10.0, and
+# Xyce 7.10.0 will fail on the latest master branch.
 # 
 # Use run_xyce_regression instead:
 # > https://xyce.sandia.gov/documentation-tutorials/running-the-xyce-regression-suite
@@ -16,7 +17,7 @@ PARALLEL=${PARALLEL:-false}
 
 TEST_SUITE_PATH=$HOME/Xyce_Regression
 TEST_OUTPUT_PATH=$HOME/Xyce_test
-XYCE_BIN_PATH=/usr
+XYCE_BIN_PATH=$HOME/Xyce_bin
 
 mkdir "${TEST_OUTPUT_PATH}"
 
@@ -56,8 +57,9 @@ eval "$(${TEST_SUITE_PATH}/TestScripts/suggestXyceTagList.sh ${XYCE_BIN_PATH}/bi
 #     -DCMAKE_INSTALL_PREFIX="${XYCE_BIN_PATH}" \
 #     --log-level=DEBUG \
 #     "${TEST_SUITE_PATH}"
-
-# if ! ctest --output-on-failure -j "$(nproc)"
+#
+# # -j 2 to keep all cores busy
+# if ! ctest --output-on-failure -j 2
 # then
 #     # Re-run failed tests
 #     ctest \
