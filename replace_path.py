@@ -13,7 +13,7 @@
 #
 
 from argparse import ArgumentParser
-from os import environ
+from os import getenv
 from pathlib import Path
 
 if __name__ == '__main__':
@@ -29,9 +29,11 @@ if __name__ == '__main__':
     # Generate file list
     files = list(Path(args.path).rglob('cmake_install.cmake'))
 
-    build_type = 'serial'
-    if environ.get('PARALLEL'):
+    build_type = getenv('PARALLEL', 'false').lower()
+    if build_type in ['true', 't', 'yes', 'y', '1']:
         build_type = 'parallel'
+    else:
+        build_type = 'serial'
 
     for file in files:
         content: str = file.read_text()
