@@ -7,6 +7,10 @@ name: Initialize build and release
 
 on:
     push:
+        paths-ignore:
+            - '.gitignore'
+            - '**/*.md'
+            - '**/*.toml'
     workflow_dispatch:
 
 env:
