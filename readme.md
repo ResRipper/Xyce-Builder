@@ -9,6 +9,13 @@ Scripts to build and test Xyce.
 
 Parallel/MPI build is disable by default, since running the test suite takes extreamly long time (>12h on VM with 4x Zen 4 cores).
 
+## Prerequisites for binary
+
+- FFTW
+- Suitesparse
+- GCC-Libs
+- ADMS (optional, no-longer activly maintained)
+
 ## Usage
 
 1. Pull all repositories and install dependencies
@@ -25,25 +32,3 @@ Parallel/MPI build is disable by default, since running the test suite takes ext
     - [build.sh](./build.sh)
 
 Output file: `~/xyce_<serial or parallel>-<version>.tar.zst`
-
-## Enabled options
-
-### Trilinos
-
-- Trilinos_ENABLE_OpenMP
-- TPL_ENABLE_METIS
-
-#### Additional options for parallel
-
-- Trilinos_ENABLE_ShyLU
-- Trilinos_ENABLE_ShyLU_NodeBasker
-- TPL_ENABLE_ParMETIS
-
-### Xyce
-
-- Xyce_PLUGIN_SUPPORT
-
-#### Additional options for parallel
-
-- Xyce_SHYLU
-- Xyce_AMESOS2_SHYLUBASKER
