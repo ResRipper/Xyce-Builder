@@ -7,8 +7,6 @@
 
 Scripts to build and test Xyce.
 
-Parallel/MPI build is disabled by default, since running the test suite takes extreamly long time (>12h on VM with 4x Zen 4 cores).
-
 ## Prerequisites for binary
 
 - FFTW
