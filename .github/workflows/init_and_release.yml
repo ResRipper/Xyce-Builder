@@ -18,13 +18,13 @@ env:
 
 jobs:
     start_builder:
-        # strategy:
-        #     matrix:
-        #         parallel: [true, false]
+        strategy:
+            matrix:
+                parallel: [true, false]
         uses: ./.github/workflows/builder.yml
         with:
-            # parallel: ${{ matrix.parallel }}
-            parallel: false
+            parallel: ${{ matrix.parallel }}
+            # parallel: false
             # Trilinos' version is determined by Xyce
             # https://github.com/Xyce/Xyce/blob/master/INSTALL.md#building-trilinos
             trilinos_version: '14-4-0'
