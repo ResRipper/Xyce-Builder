@@ -86,6 +86,12 @@ python3 "${SCRIPT_PATH}"/replace_path.py "${XYCE_SRC}"/build
 cmake --install "${XYCE_SRC}"/build --prefix "${BIN_PATH}"
 
 # Build documentation
+
+## Suppress latexmk output 
+cd "${XYCE_SRC}" || exit
+patch -p1 -i "${SCRIPT_PATH}"/patch/suppress_latexmk_RG.patch || exit
+patch -p1 -i "${SCRIPT_PATH}"/patch/suppress_latexmk_UG.patch || exit
+
 ## Reference guide
 cd "${XYCE_SRC}"/doc/Reference_Guide || exit
 ### Replace Sandia's internal class

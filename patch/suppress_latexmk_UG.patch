@@ -1,0 +1,19 @@
+diff --git a/doc/Users_Guide/Makefile b/doc/Users_Guide/Makefile
+index 55dcfaf..c331586 100644
+--- a/doc/Users_Guide/Makefile
++++ b/doc/Users_Guide/Makefile
+@@ -6,11 +6,11 @@ export BIBINPUTS=:../Common_Guide_Files/
+ .PHONY : FORCE_MAKE
+ all : Xyce_UG.pdf
+ %.pdf : %.tex FORCE_MAKE
+-	latexmk -pdf $<
++	latexmk -interaction="batchmode" -pdf $<
+ 
+ clean:
+-	latexmk -c -bibtex
++	latexmk -c -interaction="batchmode" -bibtex
+ 
+ realclean:
+-	latexmk -C -pdf -bibtex
++	latexmk -C -interaction="batchmode" -pdf -bibtex
+ 
