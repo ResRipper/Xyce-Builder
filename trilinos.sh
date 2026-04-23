@@ -36,24 +36,24 @@ BUILD_CONFIG=(
 # Specify compilers and cmake file
 if [ "$PARALLEL" = true ]; then
     BUILD_CONFIG+=(
-        '-D CMAKE_C_COMPILER=mpicc'
-        '-D CMAKE_CXX_COMPILER=mpic++'
-        '-D CMAKE_Fortran_COMPILER=mpif77'
-        "-C ${XYCE_SRC}/cmake/trilinos/trilinos-MPI-base.cmake"
+        -D CMAKE_C_COMPILER=mpicc
+        -D CMAKE_CXX_COMPILER=mpic++
+        -D CMAKE_Fortran_COMPILER=mpif77
+        -C "${XYCE_SRC}/cmake/trilinos/trilinos-MPI-base.cmake"
 
         # ShyLU require MPI
-        '-D Trilinos_ENABLE_ShyLU=ON'
-        '-D Trilinos_ENABLE_ShyLU_NodeBasker=ON' # Xyce support Basker solver
+        -D Trilinos_ENABLE_ShyLU=ON
+        -D Trilinos_ENABLE_ShyLU_NodeBasker=ON # Xyce support Basker solver
 
         # parMETIS
-        '-D TPL_ENABLE_ParMETIS=ON'
+        -D TPL_ENABLE_ParMETIS=ON
     )
 else
     BUILD_CONFIG+=(
-        '-D CMAKE_C_COMPILER=gcc'
-        '-D CMAKE_CXX_COMPILER=g++'
-        '-D CMAKE_Fortran_COMPILER=gfortran'
-        "-C ${XYCE_SRC}/cmake/trilinos/trilinos-base.cmake"
+        -D CMAKE_C_COMPILER=gcc
+        -D CMAKE_CXX_COMPILER=g++
+        -D CMAKE_Fortran_COMPILER=gfortran
+        -C "${XYCE_SRC}/cmake/trilinos/trilinos-base.cmake"
     )
 fi
 

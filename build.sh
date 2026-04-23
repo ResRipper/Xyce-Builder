@@ -32,8 +32,8 @@ FLAGS=(
 BUILD_CONFIG=(
     "-D Trilinos_ROOT=${Trilinos_PATH}"
     "-D CMAKE_INSTALL_PREFIX=${INSTALL_PATH}"
-    '-D Xyce_PLUGIN_SUPPORT=ON'
-    "-D Xyce_ROL=ON"
+    -D Xyce_PLUGIN_SUPPORT=ON
+    -D Xyce_ROL=ON
 
     # # Test
     # '-D BUILD_TESTING=ON'
@@ -43,17 +43,17 @@ BUILD_CONFIG=(
 
 if [ "$PARALLEL" = true ]; then
     BUILD_CONFIG+=(
-        '-D CMAKE_C_COMPILER=mpicc'
-        '-D CMAKE_CXX_COMPILER=mpicxx'
+        -D CMAKE_C_COMPILER=mpicc
+        -D CMAKE_CXX_COMPILER=mpicxx
 
         # Enable ShyLU
-        '-D Xyce_SHYLU=ON'
-        '-D Xyce_AMESOS2_SHYLUBASKER=ON'
+        -D Xyce_SHYLU=ON
+        -D Xyce_AMESOS2_SHYLUBASKER=ON
     )
 else
     BUILD_CONFIG+=(
-        '-D CMAKE_C_COMPILER=gcc'
-        '-D CMAKE_CXX_COMPILER=g++'
+        -D CMAKE_C_COMPILER=gcc
+        -D CMAKE_CXX_COMPILER=g++
     )
 fi
 

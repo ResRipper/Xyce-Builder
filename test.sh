@@ -28,7 +28,7 @@ TEST_DEP=(
     'python3-numpy' 'python3-scipy'
     'libgtest-dev'
 )
-sudo apt update && sudo apt install -y ${TEST_DEP[*]}
+sudo apt update && sudo apt install -y "${TEST_DEP[@]}"
 
 # Download test suite
 git clone \

@@ -36,12 +36,10 @@ DEPS_PRL=(
     'libparmetis-dev'
 )
 
-sudo apt install -y \
-${BUILD_TOOLS[*]} \
-${DEPS[*]}
+sudo apt install -y "${BUILD_TOOLS[@]}" "${DEPS[@]}"
 
 if [ "$PARALLEL" = true ]; then
-    sudo apt install -y ${DEPS_PRL[*]}
+    sudo apt install -y "${DEPS_PRL[@]}"
 fi
 
 # LaTeX dependencies
