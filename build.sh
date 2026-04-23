@@ -10,15 +10,12 @@
 PARALLEL=${PARALLEL:-false}
 XYCE_VER=${XYCE_VER:-7.10.0}
 
-SRC_DIR=$HOME/Xyce
-Trilinos_PATH=/usr
-SCRIPT_PATH=$(pwd)
-
 SUITESPARSE_INCLUDE=/usr/include/suitesparse
 
-# Installation prefix
-BIN_PATH=$HOME/Xyce_bin
-INSTALL_PATH=/usr
+SCRIPT_PATH=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+XYCE_SRC="${SCRIPT_PATH}/Xyce"
+Trilinos_BIN="${SCRIPT_PATH}/Trilinos_bin"
+BIN_PATH="${SCRIPT_PATH}/Xyce_bin"
 mkdir -p "$BIN_PATH"
 
 # Compilier flags
@@ -30,8 +27,11 @@ FLAGS=(
 
 # Build config
 BUILD_CONFIG=(
-    "-D Trilinos_ROOT=${Trilinos_PATH}"
-    "-D CMAKE_INSTALL_PREFIX=${INSTALL_PATH}"
+    -S "${XYCE_SRC}"
+    -B "${XYCE_SRC}"/build
+    -D CMAKE_INSTALL_PREFIX="${BIN_PATH}"
+
+    -D Trilinos_ROOT="${Trilinos_BIN}"
     -D Xyce_PLUGIN_SUPPORT=ON
     -D Xyce_ROL=ON
 
@@ -57,8 +57,7 @@ else
     )
 fi
 
-cd "$SRC_DIR" && ./bootstrap
-mkdir -p build && cd build || exit
+cd "$XYCE_SRC" && ./bootstrap
 
 # Config and build
 cmake \
@@ -66,29 +65,29 @@ cmake \
 -D CMAKE_CXX_FLAGS="${FLAGS[*]}" \
 ${BUILD_CONFIG[*]} "${SRC_DIR}"
 
-cmake --build . -j "$(nproc)"
+cmake --build "${XYCE_SRC}"/build -j "$(nproc)" || exit
 
 ## Adjust installation path to comply with the FHS
 if [ "$PARALLEL" = true ]; then
-    sed -i 's|${XyceInstDir}/share|${XyceInstDir}/share/xyce-parallel|' "${SRC_DIR}"/build/buildxyceplugin.sh
-    sed -i 's|/usr/share|/usr/share/xyce-parallel|' "${SRC_DIR}"/build/utils/XyceCInterface/SetupPythonEnv.m
-    sed -i 's|${Xyce_DIR}/../../../share/|${Xyce_DIR}/../../../share/xyce-parallel|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
-    sed -i 's|<Path to Xyce Install>/share|<Path to Xyce Install>/share/xyce-parallel|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
+    sed -i 's|${XyceInstDir}/share|${XyceInstDir}/share/xyce-parallel|' "${XYCE_SRC}"/build/buildxyceplugin.sh
+    sed -i 's|/usr/share|/usr/share/xyce-parallel|' "${XYCE_SRC}"/build/utils/XyceCInterface/SetupPythonEnv.m
+    sed -i 's|${Xyce_DIR}/../../../share/|${Xyce_DIR}/../../../share/xyce-parallel|' "${XYCE_SRC}"/build/utils/ADMS/CMakeLists.txt
+    sed -i 's|<Path to Xyce Install>/share|<Path to Xyce Install>/share/xyce-parallel|' "${XYCE_SRC}"/build/utils/ADMS/CMakeLists.txt
 else
-    sed -i 's|${XyceInstDir}/share|${XyceInstDir}/share/xyce-serial|' "${SRC_DIR}"/build/buildxyceplugin.sh
-    sed -i 's|/usr/share|/usr/share/xyce-serial|' "${SRC_DIR}"/build/utils/XyceCInterface/SetupPythonEnv.m
-    sed -i 's|${Xyce_DIR}/../../../share/|${Xyce_DIR}/../../../share/xyce-serial|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
-    sed -i 's|<Path to Xyce Install>/share|<Path to Xyce Install>/share/xyce-serial|' "${SRC_DIR}"/build/utils/ADMS/CMakeLists.txt
+    sed -i 's|${XyceInstDir}/share|${XyceInstDir}/share/xyce-serial|' "${XYCE_SRC}"/build/buildxyceplugin.sh
+    sed -i 's|/usr/share|/usr/share/xyce-serial|' "${XYCE_SRC}"/build/utils/XyceCInterface/SetupPythonEnv.m
+    sed -i 's|${Xyce_DIR}/../../../share/|${Xyce_DIR}/../../../share/xyce-serial|' "${XYCE_SRC}"/build/utils/ADMS/CMakeLists.txt
+    sed -i 's|<Path to Xyce Install>/share|<Path to Xyce Install>/share/xyce-serial|' "${XYCE_SRC}"/build/utils/ADMS/CMakeLists.txt
 fi
 
-python3 "${SCRIPT_PATH}"/replace_path.py "${SRC_DIR}"/build
+python3 "${SCRIPT_PATH}"/replace_path.py "${XYCE_SRC}"/build
 
 # Install to binary path
-cmake --install . --prefix "${BIN_PATH}"
+cmake --install "${XYCE_SRC}"/build --prefix "${BIN_PATH}"
 
 # Build documentation
 ## Reference guide
-cd "${SRC_DIR}"/doc/Reference_Guide || exit
+cd "${XYCE_SRC}"/doc/Reference_Guide || exit
 ### Replace Sandia's internal class
 sed -i 's|\\documentclass\[11pt,report\]{SANDreport}|\\documentclass\[11pt,letterpaper\]{scrreprt}|' Xyce_RG.tex
 sed -i 's|\\usepackage\[sand\]{optional}|\\usepackage\[report\]{optional}|' Xyce_RG.tex
@@ -96,7 +95,7 @@ sed -i 's|\\SANDauthor{|\\author{|' Xyce_RG.tex
 make
 
 ## User guide
-cd "${SRC_DIR}"/doc/Users_Guide || exit
+cd "${XYCE_SRC}"/doc/Users_Guide || exit
 ### Replace Sandia's internal class
 sed -i 's|\\documentclass\[11pt,report\]{SANDreport}|\\documentclass\[11pt,letterpaper\]{scrreprt}|' Xyce_UG.tex
 sed -i 's|\\usepackage\[sand\]{optional}|\\usepackage\[report\]{optional}|' Xyce_UG.tex
@@ -119,18 +118,18 @@ mv "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"/CPack.OSLicense.txt "${BIN_PATH}
 ### Delete 'no pdf doc anymore' note
 rm "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"/README.TXT
 
-mv "${SRC_DIR}"/doc/Reference_Guide/Xyce_RG.pdf "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"
-mv "${SRC_DIR}"/doc/Users_Guide/Xyce_UG.pdf "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"
+mv "${XYCE_SRC}"/doc/Reference_Guide/Xyce_RG.pdf "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"
+mv "${XYCE_SRC}"/doc/Users_Guide/Xyce_UG.pdf "${BIN_PATH}"/share/doc/xyce-"${BUILD_TYPE}"
 
 # Pack
 if [ "$PARALLEL" = true ]; then
     tar -c \
     --zstd \
-    -f "${HOME}/xyce_parallel-${XYCE_VER}.tar.zst" \
+    -f "${SCRIPT_PATH}/xyce_parallel-${XYCE_VER}.tar.zst" \
     -C "${BIN_PATH}"/ .
 else
     tar -c \
     --zstd \
-    -f "${HOME}/xyce_serial-${XYCE_VER}.tar.zst" \
+    -f "${SCRIPT_PATH}/xyce_serial-${XYCE_VER}.tar.zst" \
     -C "${BIN_PATH}"/ .
 fi

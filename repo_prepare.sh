@@ -4,11 +4,12 @@
 
 # Download Trilinos and Xyce repo
 
-TRILINOS_VER=${TRILINOS_VER:-14-4-0}
-TRILINOS_SRC=$HOME/Trilinos
-
 XYCE_VER=${XYCE_VER:-7.10.0}
-XYCE_SRC=$HOME/Xyce
+TRILINOS_VER=${TRILINOS_VER:-14-4-0}
+
+SCRIPT_PATH=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+XYCE_SRC="${SCRIPT_PATH}/Xyce"
+TRILINOS_SRC="${SCRIPT_PATH}/Trilinos"
 
 # Trilinos
 git clone \

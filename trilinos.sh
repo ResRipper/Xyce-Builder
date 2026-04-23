@@ -8,9 +8,12 @@
 
 PARALLEL=${PARALLEL:-false}
 
-SRC_DIR=$HOME/Trilinos
-BIN_PATH=/usr
-XYCE_SRC=$HOME/Xyce
+SCRIPT_PATH=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+
+XYCE_SRC="${SCRIPT_PATH}/Xyce"
+TRILINOS_SRC="${SCRIPT_PATH}/Trilinos"
+BIN_PATH="${SCRIPT_PATH}/Trilinos_bin"
+mkdir -p "$BIN_PATH"
 
 LIB_PATH=/usr/lib64
 SUITESPARSE_INCLUDE=/usr/include/suitesparse
@@ -19,6 +22,10 @@ FLAGS="-O3 -fPIC"
 
 # Build config
 BUILD_CONFIG=(
+    -S "${TRILINOS_SRC}"
+    -B "${TRILINOS_SRC}"/build
+    -D CMAKE_INSTALL_PREFIX="${BIN_PATH}"
+
     # AMD
     "-D AMD_LIBRARY_DIRS=${LIB_PATH}"
     "-D TPL_AMD_INCLUDE_DIRS=${SUITESPARSE_INCLUDE}"
@@ -57,9 +64,6 @@ else
     )
 fi
 
-mkdir -p "$BIN_PATH" "$SRC_DIR"/build
-cd "$SRC_DIR"/build || exit
-
 # Build
 cmake \
     -D CMAKE_INSTALL_PREFIX="${BIN_PATH}" \
@@ -68,4 +72,4 @@ cmake \
     -D CMAKE_Fortran_FLAGS="$FLAGS" \
     ${BUILD_CONFIG[*]} "$SRC_DIR"
 
-sudo cmake --build . -j "$(nproc)" -t install
+cmake --build "${TRILINOS_SRC}"/build -j "$(nproc)" -t install

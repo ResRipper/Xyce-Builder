@@ -15,11 +15,12 @@
 XYCE_VER=${XYCE_VER:-7.10.0}
 PARALLEL=${PARALLEL:-false}
 
-TEST_SUITE_PATH=$HOME/Xyce_Regression
-TEST_OUTPUT_PATH=$HOME/Xyce_test
-XYCE_BIN_PATH=$HOME/Xyce_bin
+SCRIPT_PATH=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+TEST_SUITE_PATH="${SCRIPT_PATH}/Xyce_Regression"
+TEST_OUTPUT_PATH="${SCRIPT_PATH}/Xyce_test"
+XYCE_BIN_PATH="${SCRIPT_PATH}/Xyce_bin"
 
-mkdir "${TEST_OUTPUT_PATH}"
+mkdir -p "${TEST_OUTPUT_PATH}"
 
 # Install prerequisites
 TEST_DEP=(

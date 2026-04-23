@@ -81,7 +81,7 @@ jobs:
                 uses: actions/upload-artifact@v6,
                 with: {
                     name: "${{ env.XYCE_VER }}-${{ inputs.parallel == true && 'parallel' || 'serial' }}",
-                    path: "~/xyce_${{ inputs.parallel == true && 'parallel' || 'serial' }}-${{ env.XYCE_VER }}.tar.zst",
+                    path: "./xyce_${{ inputs.parallel == true && 'parallel' || 'serial' }}-${{ env.XYCE_VER }}.tar.zst",
                     if-no-files-found: error
                 }
             }
