@@ -18,8 +18,6 @@ mkdir -p "$BIN_PATH"
 LIB_PATH=/usr/lib64
 SUITESPARSE_INCLUDE=/usr/include/suitesparse
 
-FLAGS="-O3 -fPIC"
-
 # Build config
 BUILD_CONFIG=(
     -S "${TRILINOS_SRC}"
@@ -65,11 +63,15 @@ else
 fi
 
 # Build
+
+## Import flags/options
+source "${SCRIPT_PATH}/flags_var"
+export CFLAGS="${C_FLAGS[*]}"
+export CXXFLAGS="${CXX_FLAGS[*]}"
+export LDFLAGS="${LD_FLAGS[*]}"
+
 cmake \
-    -D CMAKE_INSTALL_PREFIX="${BIN_PATH}" \
-    -D CMAKE_C_FLAGS="$FLAGS" \
-    -D CMAKE_CXX_FLAGS="$FLAGS" \
-    -D CMAKE_Fortran_FLAGS="$FLAGS" \
-    ${BUILD_CONFIG[*]} "$SRC_DIR"
+    -D CMAKE_Fortran_FLAGS="${C_FLAGS[*]}" \
+    "${CMAKE_OPTS[@]}" "${BUILD_CONFIG[@]}"
 
 cmake --build "${TRILINOS_SRC}"/build -j "$(nproc)" -t install

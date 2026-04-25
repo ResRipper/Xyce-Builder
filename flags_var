@@ -1,0 +1,68 @@
+#!/bin/bash
+# Copyright 2026 ResRipper.
+# SPDX-License-Identifier: Apache-2.0
+
+# Common build flags
+# References:
+# - https://wiki.gentoo.org/wiki/GCC_optimization
+# - https://wiki.archlinux.org/title/Arch_package_guidelines/Security
+# - https://linux.die.net/man/1/ld
+# - https://wiki.archlinux.org/title/CMake_package_guidelines
+# - https://best.openssf.org/Compiler-Hardening-Guides/Compiler-Options-Hardening-Guide-for-C-and-C++.html
+
+C_FLAGS=(
+    # Optimization
+    -O3
+    ## Target relatively morden CPUs
+    ## https://en.wikipedia.org/w/index.php?title=X86-64&section=20#Microarchitecture_levels
+    ## > Test `SENS/gummel_pmos_xyce` will fail on v3
+    -march=x86-64-v2
+    -pipe
+    -fno-omit-frame-pointer
+    -mno-omit-leaf-frame-pointer
+    -fno-plt
+
+    ## LTO
+    # -flto
+    # -Werror=odr
+    # -Werror=strict-aliasing
+    # -Werror=lto-type-mismatch
+
+    # Hardening
+    -fexceptions
+    -fstack-protector-strong
+    -fstack-clash-protection
+    -fPIC
+    -fPIE
+    -pie
+    '-Wp,-D_FORTIFY_SOURCE=3'
+    -fstrict-flex-arrays=3
+    -fcf-protection=full
+    -fno-delete-null-pointer-checks
+)
+
+CXX_FLAGS=(
+    "${C_FLAGS[@]}"
+
+    # Hardening
+    # '-Wp,-D_GLIBCXX_ASSERTIONS' # Error code 10 on multiple tests
+)
+
+LD_FLAGS=(
+    # Optimization
+    '-Wl,-O1'
+    '-Wl,--sort-common'
+    '-Wl,--as-needed'
+    '-Wl,-z,pack-relative-relocs'
+
+    # Hardening
+    '-Wl,-z,relro'
+    '-Wl,-z,now'
+    '-Wl,-z,nodlopen'
+    '-Wl,-z,noexecstack'
+)
+
+CMAKE_OPTS=(
+    -D CMAKE_BUILD_TYPE=None
+    -W no-dev
+)

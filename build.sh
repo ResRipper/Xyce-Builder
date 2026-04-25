@@ -18,13 +18,6 @@ Trilinos_BIN="${SCRIPT_PATH}/Trilinos_bin"
 BIN_PATH="${SCRIPT_PATH}/Xyce_bin"
 mkdir -p "$BIN_PATH"
 
-# Compilier flags
-FLAGS=(
-    '-O3' # Optimize level: 3
-    '-fPIC' # Position independent code
-    "-I${SUITESPARSE_INCLUDE}"
-)
-
 # Build config
 BUILD_CONFIG=(
     -S "${XYCE_SRC}"
@@ -59,11 +52,18 @@ fi
 
 cd "$XYCE_SRC" && ./bootstrap
 
-# Config and build
+# Configure and build
+
+## Import flags/options
+source "${SCRIPT_PATH}/flags_var"
+export CFLAGS="${C_FLAGS[*]} -I${SUITESPARSE_INCLUDE}"
+export CXXFLAGS="${CXX_FLAGS[*]} -I${SUITESPARSE_INCLUDE}"
+export LDFLAGS="${LD_FLAGS[*]}"
+
 cmake \
--D CMAKE_C_FLAGS="${FLAGS[*]}" \
--D CMAKE_CXX_FLAGS="${FLAGS[*]}" \
-${BUILD_CONFIG[*]} "${SRC_DIR}"
+    -D BUILD_SHARED_LIBS=ON \
+    "${CMAKE_OPTS[@]}" "${BUILD_CONFIG[@]}" \
+    || exit
 
 cmake --build "${XYCE_SRC}"/build -j "$(nproc)" || exit
 
