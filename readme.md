@@ -29,4 +29,4 @@ Scripts to build and test Xyce.
 
     - [build.sh](./build.sh)
 
-Output file: `~/xyce_<serial or parallel>-<version>.tar.zst`
+Output file: `xyce_<serial or parallel>-<version>.tar.zst`
